@@ -93,20 +93,13 @@ string reverseString(string text)
 string encodeShiftCipherText(string text, int shift_cipher)
 {
     string output = "";
+    int range_size = 95;
+
     for (char ch : text)
     {
-        char shifted = ch + shift_cipher;
-
-        // 32-126
-        while (shifted > 126)
-        {
-            shifted = 32 + (shifted - 127);
-        }
-
-        while (shifted < 32)
-        {
-            shifted = 127 - (32 - shifted);
-        }
+        int original_offset = ch - 32;
+        int new_offset = (original_offset + shift_cipher) % range_size;
+        char shifted = new_offset + 32;
         output += shifted;
     }
     return output;
@@ -296,16 +289,37 @@ string decodedApplyASCII(string text)
         if (text[i] == '{')
         {
             string num = "";
+            int start = i;
             i++;
             while (i < text.length() && text[i] != '}')
             {
-
                 num += text[i];
                 i++;
             }
-            if (!num.empty())
+            bool properlyClosed = (i < text.length() && text[i] == '}');
+            if (properlyClosed && !num.empty())
             {
-                output += char(stoi(num));
+                bool isNumber = true;
+                for (char ch : num)
+                {
+                    if (!isdigit(ch))
+                    {
+                        isNumber = false;
+                        break;
+                    }
+                }
+                if (isNumber)
+                {
+                    output += char(stoi(num));
+                }
+                else
+                {
+                    output += text.substr(start, i - start + 1);
+                }
+            }
+            else
+            {
+                output += text.substr(start, (i < text.length() ? i - start + 1 : text.length() - start));
             }
         }
         else
@@ -318,19 +332,13 @@ string decodedApplyASCII(string text)
 string decodedShiftCipherText(string text, int shift_cipher)
 {
     string output;
+    int range_size = 95;
+
     for (char ch : text)
     {
-        char shifted = ch - shift_cipher;
-
-        while (shifted < 32)
-        {
-            shifted = 127 - (32 - shifted);
-        }
-        while (shifted > 126)
-        {
-            shifted = 32 + (shifted - 127);
-        }
-
+        int original_offset = ch - 32;
+        int new_offset = (original_offset - shift_cipher + range_size) % range_size;
+        char shifted = new_offset + 32;
         output += shifted;
     }
     return output;
@@ -450,12 +458,15 @@ string encoded_and_decoded()
     else if (choice == 1)
     {
         cout << "\nEnter a message to encode \nMessage: ";
-        cin.ignore();
+        cin.clear();
+        cin.ignore(10000, '\n');
         getline(cin, text);
         while (true)
         {
             cout << "\nSelect Mode \n1. Basic Mode (password only) \n2. Advanced Mode (fully customizable) \nSelect: ";
             cin >> mode;
+            cin.clear();
+            cin.ignore(10000, '\n');
 
             if (mode != 1 && mode != 2)
             {
@@ -470,7 +481,8 @@ string encoded_and_decoded()
     else if (choice == 2)
     {
         cout << "\nEnter a message to decode \nMessage: ";
-        cin.ignore();
+        cin.clear();
+        cin.ignore(10000, '\n');
         getline(cin, text);
 
         decoded_text = decodedText(text);
@@ -480,7 +492,8 @@ string encoded_and_decoded()
     {
         cout << "Invalid number entered!" << endl
              << endl;
-        cin.ignore();
+        cin.clear();
+        cin.ignore(10000, '\n');
         return encoded_and_decoded();
     }
 }
