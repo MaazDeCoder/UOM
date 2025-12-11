@@ -1,4 +1,4 @@
-# Encoder & Decoder Project
+# Secure Text Encoding and Decoding System with Multi-Layer Transformation
 ##  Overview
 This project implements a customizable text encoding and decoding system that applies multiple reversible transformation layers to secure message transmission. The program is written in C++ and allows users to encode messages using several configurable techniques and decode them through password-based authentication.
 
