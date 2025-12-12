@@ -3,8 +3,72 @@
 
 using namespace std;
 
-// -------------------------------------------- Helper Functions ---------------------------------------------------
+/* ===========================================================================================
+    PROJECT: Secure Text Encoding and Decoding System with Multi-Layer Transformation
+    COURSE: Programming Fundamentals (PF)
 
+    This program demonstrates core PF concepts:
+    - Input/Output operations
+    - Variables and Data Types
+    - Control Structures (if/else + loops)
+    - Functions and Modular Programming
+    - String Manipulation
+    - ASCII-based Character Processing
+    - Basic Encryption Logic
+=========================================================================================== */
+
+// ----------------------------------------------- FUNCTION DECLARATIONS ------------------------------------------------ //
+
+// Helper Functions
+bool askYesNo(string output_message);
+int askInt(string output_message, int min, int max);
+
+// Common Functions
+string blockReversal(string text, int blockSize);
+string reverseString(string text);
+int hashPassword(string password);
+
+// Encoding Pipeline
+string encodeShiftCipherText(string text, int shift_cipher);
+string encodedApplyASCII(string text);
+string encodedStegnography(string text);
+string encodedMetadata(int encoded_password_hash, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography);
+string encoding(string text, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography);
+string encoderInterface(string text, int mode);
+
+// Decoding Pipeline
+string decodedStegnography(string text);
+string decodedApplyASCII(string text);
+string decodedShiftCipherText(string text, int shift_cipher);
+string decodeMetadata(string encrypted_metadata, int hash_password);
+string decoding(string text, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography);
+string decoderInterface(string encoded_message);
+
+// Main Application Interface
+string mainApp();
+
+// Program entry point
+int main()
+{
+    cout << "====================================================" << endl;
+    cout << "            Encoder & Decoder -- by Maaz Ali" << endl;
+    cout << "====================================================" << endl;
+
+    string output = mainApp();
+    if (!output.empty())
+    {
+        cout << "Result: " << output << endl;
+    }
+
+    return 0;
+}
+
+/* ===========================================================================================
+    SECTION 1: HELPER FUNCTIONS
+    (PF Topics: Functions, Loops, Conditions)
+=========================================================================================== */
+
+// Ask user a yes/no question and return boolean response
 bool askYesNo(string output_message)
 {
     char choice;
@@ -30,6 +94,7 @@ bool askYesNo(string output_message)
     }
 }
 
+// Ask user for an integer within a specified range
 int askInt(string output_message, int min, int max)
 {
     int value;
@@ -52,6 +117,12 @@ int askInt(string output_message, int min, int max)
     }
 }
 
+/* ===========================================================================================
+    SECTION 2: Common Functions
+    (PF Topics: Functions, Control Structures, Character Manipulation, String Manipulation)
+=========================================================================================== */
+
+// Reverse blocks of text based on specified block size
 string blockReversal(string text, int blockSize)
 {
     if (blockSize <= 0 or blockSize >= text.length())
@@ -63,11 +134,13 @@ string blockReversal(string text, int blockSize)
     {
         string block;
 
+        // Extract block
         for (int j = 0; j < blockSize && (i + j) < textLength; j++)
         {
             block += text[i + j];
         }
 
+        // Reverse block and append to output
         for (int k = block.length() - 1; k >= 0; k--)
         {
             output += block[k];
@@ -76,6 +149,7 @@ string blockReversal(string text, int blockSize)
     return output;
 }
 
+// Reverse the entire string
 string reverseString(string text)
 {
 
@@ -88,8 +162,23 @@ string reverseString(string text)
     return output;
 }
 
-// -------------------------------------------------- Encoding -----------------------------------------------
+// Generate password hash
+int hashPassword(string password)
+{
+    int h = 0;
+    for (char ch : password)
+    {
+        h = h * 42 + (int)ch;
+    }
+    return h;
+}
 
+/* ===========================================================================================
+    SECTION 3: ENCODING PIPELINE
+    (PF Topics: Functions, String Manipulation, Control Structures)
+=========================================================================================== */
+
+// Shift cipher encoding - shifts characters by specified amount within printable ASCII range
 string encodeShiftCipherText(string text, int shift_cipher)
 {
     string output = "";
@@ -105,6 +194,7 @@ string encodeShiftCipherText(string text, int shift_cipher)
     return output;
 }
 
+// Apply ASCII conversion on even indexed characters
 string encodedApplyASCII(string text)
 {
     string output = "";
@@ -122,6 +212,7 @@ string encodedApplyASCII(string text)
     return output;
 }
 
+// Apply stegnography by inserting '!' before every character at even indices
 string encodedStegnography(string text)
 {
     string output = "";
@@ -136,16 +227,7 @@ string encodedStegnography(string text)
     return output;
 }
 
-int encodedPassword(string password)
-{
-    int h = 0;
-    for (char ch : password)
-    {
-        h = h * 42 + (int)ch;
-    }
-    return h;
-}
-
+// Generate encoded metadata string
 string encodedMetadata(int encoded_password_hash, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography)
 {
 
@@ -190,6 +272,7 @@ string encodedMetadata(int encoded_password_hash, int shift_cipher, int blocksiz
     return encrypted_metadata;
 }
 
+// Generate fully encoded text based on selected transformations
 string encoding(string text, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography)
 {
     string encoded_text;
@@ -219,7 +302,8 @@ string encoding(string text, int shift_cipher, int blocksize, bool reverse_strin
     return encoded_text;
 }
 
-string encodedText(string text, int mode)
+// Interface for encoding text with user-defined settings
+string encoderInterface(string text, int mode)
 {
     // Default
     int shift_cipher = 3;
@@ -254,15 +338,19 @@ string encodedText(string text, int mode)
         ASCII_on_even_index = askYesNo("Apply ASCII conversion on even index?");
         applyStegnography = askYesNo("Apply Stegnography?");
     }
-    int encoded_password_hash = encodedPassword(password);
+    int encoded_password_hash = hashPassword(password);
     encoded_metadata = encodedMetadata(encoded_password_hash, shift_cipher, blockSize, reverseEntireString, ASCII_on_even_index, applyStegnography);
     encoded_text = encoding(text, shift_cipher, blockSize, reverseEntireString, ASCII_on_even_index, applyStegnography);
     result = encoded_metadata + "||" + encoded_text;
     return result;
 }
 
-// -------------------------------------------------- Decoding -----------------------------------------------
+/* ===========================================================================================
+    SECTION 4: DECODING PIPELINE
+    (PF Topics: Loops, Functions, Conditions, Character Manipulation)
+=========================================================================================== */
 
+// Remove stegnography by skipping every third character
 string decodedStegnography(string text)
 {
     string output;
@@ -280,6 +368,7 @@ string decodedStegnography(string text)
     return output;
 }
 
+// Decode ASCII encoded segments back to characters
 string decodedApplyASCII(string text)
 {
     string output = "";
@@ -299,6 +388,7 @@ string decodedApplyASCII(string text)
             bool properlyClosed = (i < text.length() && text[i] == '}');
             if (properlyClosed && !num.empty())
             {
+                // if properly formatted and numeric
                 bool isNumber = true;
                 for (char ch : num)
                 {
@@ -329,6 +419,8 @@ string decodedApplyASCII(string text)
     }
     return output;
 }
+
+// Reverse shift cipher to retrieve original text
 string decodedShiftCipherText(string text, int shift_cipher)
 {
     string output;
@@ -344,6 +436,7 @@ string decodedShiftCipherText(string text, int shift_cipher)
     return output;
 }
 
+// Decode metadata using password hash
 string decodeMetadata(string encrypted_metadata, int hash_password)
 {
 
@@ -371,6 +464,7 @@ string decodeMetadata(string encrypted_metadata, int hash_password)
     return decrypted_metadata;
 }
 
+// Full decoding pipeline applying transformations in reverse order
 string decoding(string text, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography)
 {
 
@@ -398,17 +492,19 @@ string decoding(string text, int shift_cipher, int blocksize, bool reverse_strin
     return decoded_text;
 }
 
-string decodedText(string encoded_message)
+// Interface for decoding text with password verification
+string decoderInterface(string encoded_message)
 {
     string password;
     cout << "\nEnter password: \nPassword: ";
     cin >> password;
-    int entered_hash = encodedPassword(password);
+    int entered_hash = hashPassword(password);
     int hash_start = encoded_message.find("!!p");
     int hash_end = encoded_message.find("||", hash_start + 3);
     string stored_hash_str = encoded_message.substr(hash_start + 3, hash_end - hash_start - 3);
     int stored_hash = stoi(stored_hash_str);
 
+    // Verify password
     if (entered_hash != stored_hash)
     {
         return "Error: Wrong password! Access denied.";
@@ -433,9 +529,13 @@ string decodedText(string encoded_message)
     return decoded_message;
 }
 
-// -------------------------------------------- Encoded and decoded ------------------------------------------
+/* ===========================================================================================
+    SECTION 5: MAIN PROGRAM CONTROL FLOW
+    (PF Topics: Input/Output, Control Structures, Functions)
+=========================================================================================== */
 
-string encoded_and_decoded()
+// Main application interface
+string mainApp()
 {
     int choice;
     int mode = -1;
@@ -447,7 +547,7 @@ string encoded_and_decoded()
         cout << "Invalid input! Please enter a number." << endl;
         cin.clear();
         cin.ignore(10000, '\n');
-        return encoded_and_decoded();
+        return mainApp();
     }
 
     if (choice == 0)
@@ -474,7 +574,7 @@ string encoded_and_decoded()
                 cin.ignore();
                 continue;
             }
-            encoded_text = encodedText(text, mode);
+            encoded_text = encoderInterface(text, mode);
             return encoded_text;
         }
     }
@@ -485,7 +585,7 @@ string encoded_and_decoded()
         cin.ignore(10000, '\n');
         getline(cin, text);
 
-        decoded_text = decodedText(text);
+        decoded_text = decoderInterface(text);
         return decoded_text;
     }
     else
@@ -494,23 +594,6 @@ string encoded_and_decoded()
              << endl;
         cin.clear();
         cin.ignore(10000, '\n');
-        return encoded_and_decoded();
+        return mainApp();
     }
-}
-
-// -------------------------------------------------- Main Function -----------------------------------------------
-
-int main()
-{
-    cout << "====================================================" << endl;
-    cout << "            Encoder & Decoder -- by Maaz Ali" << endl;
-    cout << "====================================================" << endl;
-
-    string output = encoded_and_decoded();
-    if (!output.empty())
-    {
-        cout << "Result: " << output << endl;
-    }
-
-    return 0;
 }
