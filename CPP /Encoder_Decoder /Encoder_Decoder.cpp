@@ -26,13 +26,13 @@ int askInt(string output_message, int min, int max);
 // Common Functions
 string blockReversal(string text, int blockSize);
 string reverseString(string text);
-int hashPassword(string password);
+unsigned long long hashPassword(string password);
 
 // Encoding Pipeline
 string encodeShiftCipherText(string text, int shift_cipher);
 string encodedApplyASCII(string text);
 string encodedStegnography(string text);
-string encodedMetadata(int encoded_password_hash, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography);
+string encodedMetadata(unsigned long long encoded_password_hash, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography);
 string encoding(string text, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography);
 string encoderInterface(string text, int mode);
 
@@ -40,7 +40,7 @@ string encoderInterface(string text, int mode);
 string decodedStegnography(string text);
 string decodedApplyASCII(string text);
 string decodedShiftCipherText(string text, int shift_cipher);
-string decodeMetadata(string encrypted_metadata, int hash_password);
+string decodeMetadata(string encrypted_metadata, unsigned long long h_password);
 string decoding(string text, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography);
 string decoderInterface(string encoded_message);
 
@@ -163,9 +163,9 @@ string reverseString(string text)
 }
 
 // Generate password hash
-int hashPassword(string password)
+unsigned long long hashPassword(string password)
 {
-    int h = 0;
+    unsigned long long h = 0;
     for (char ch : password)
     {
         h = h * 42 + (int)ch;
@@ -228,7 +228,7 @@ string encodedStegnography(string text)
 }
 
 // Generate encoded metadata string
-string encodedMetadata(int encoded_password_hash, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography)
+string encodedMetadata(unsigned long long encoded_password_hash, int shift_cipher, int blocksize, bool reverse_string, bool apply_ascii, bool apply_stegnography)
 {
 
     string metadata = "";
@@ -338,7 +338,7 @@ string encoderInterface(string text, int mode)
         ASCII_on_even_index = askYesNo("Apply ASCII conversion on even index?");
         applyStegnography = askYesNo("Apply Stegnography?");
     }
-    int encoded_password_hash = hashPassword(password);
+    unsigned long long encoded_password_hash = hashPassword(password);
     encoded_metadata = encodedMetadata(encoded_password_hash, shift_cipher, blockSize, reverseEntireString, ASCII_on_even_index, applyStegnography);
     encoded_text = encoding(text, shift_cipher, blockSize, reverseEntireString, ASCII_on_even_index, applyStegnography);
     result = encoded_metadata + "||" + encoded_text;
@@ -437,7 +437,7 @@ string decodedShiftCipherText(string text, int shift_cipher)
 }
 
 // Decode metadata using password hash
-string decodeMetadata(string encrypted_metadata, int hash_password)
+string decodeMetadata(string encrypted_metadata, unsigned long long hash_password)
 {
 
     string hash_string = to_string(hash_password);
@@ -498,11 +498,11 @@ string decoderInterface(string encoded_message)
     string password;
     cout << "\nEnter password: \nPassword: ";
     cin >> password;
-    int entered_hash = hashPassword(password);
+    unsigned long long entered_hash = hashPassword(password);
     int hash_start = encoded_message.find("!!p");
     int hash_end = encoded_message.find("||", hash_start + 3);
     string stored_hash_str = encoded_message.substr(hash_start + 3, hash_end - hash_start - 3);
-    int stored_hash = stoi(stored_hash_str);
+    unsigned long long stored_hash = stoull(stored_hash_str);
 
     // Verify password
     if (entered_hash != stored_hash)
